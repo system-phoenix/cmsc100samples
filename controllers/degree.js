@@ -1,0 +1,46 @@
+var db = require(__dirname + './../lib/mysql');
+
+exports.find = function(req, res, next){
+	db.query("select * from degree", function(err, rows){
+		if(err) return next(err);
+		res.send(rows);
+	});
+};
+
+exports.findOne = function(req, res, next){
+	db.query("select * from degree where degree_id='" + [req.params.degree_id] + "'", function(err, rows){
+		if(err) return next(err);
+		if(rows.length === 0) {
+			res.status(404).send({message: "Degree program not found"});
+		}
+		else{
+			res.send(rows[0]);
+		}
+	});
+};
+
+exports.insert = function(req, res, next){
+	db.query("insert into degree (degree_code, description, total_units) values(?, ?, ?)",
+	[req.body.degree_code, req.body.description, req.body.total_units], function(err, rows){
+		if(err) return next(err);
+		res.send(rows);
+	});
+};
+
+exports.remove = function(req, res, next){
+	db.query("delete from degree where degree_id=?", [req.params.degree_id],
+	function(err, rows){
+		if(err) return next(err);
+		res.send(rows);
+	});
+};
+
+exports.update = function(req, res, next){
+	//db.query("update degree set description='"+ [req.body.description] +"',total_units='" + [req.body.total_units] + "' where degree_id=?", [req.params.degree_id],
+	
+	db.query("update degree set description=?,total_units=? where degree_id=?", [req.body.description, req.body.total_units, req.body.degree_id],
+	function(err, rows){
+		if(err) return next(err);
+		res.send(rows);	
+	});
+};
